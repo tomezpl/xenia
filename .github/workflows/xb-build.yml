@@ -1,0 +1,79 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: xb build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4.5.0
+      with:
+        # Version range or exact version of Python or PyPy to use, using SemVer's version range syntax. Reads from .python-version if unset.
+        python-version: ">=3.6.0" # optional
+        # Used to specify a package manager for caching in the default directory. Supported values: pip, pipenv, poetry.
+        cache: pip # optional
+        # The target architecture (x86, x64) of the Python or PyPy interpreter.
+        architecture: x64 # optional
+        # Set this option if you want the action to check for the latest available version that satisfies the version spec.
+        check-latest: true # optional
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+      
+    - name: Setup Windows 10 SDK 
+      # You may pin to the exact commit or the version.
+      # uses: GuillaumeFalourd/setup-windows10-sdk-action@c4ff86d0279a1eb5d2544913834db63bcfc018e1
+      uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.11
+      with:
+        # SDK 5-digit version to install (e.g 17763, 18362, 19041)
+        sdk-version: 22621 # default is 18362
+
+    - name: Setup xb
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: xb setup
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: xb build --config=release
+      continue-on-error: true # xb build seems to fail because of the trace viewer projects which aren't actually needed for the release
+    
+    - name: Publish
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        # An optional flag which indicates if artifact read or upload errors should fail the build.
+        artifactErrorsFailBuild: true # optional, default is 
+        # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
+        artifact: "./LICENSE, ./build/bin/Windows/Release/xenia.exe, ./build/bin/Windows/Release/xenia.pdb"
+        # Indicates if the release should be the "latest" release or not.
+        makeLatest: true # optional, default is legacy
+        # Indicates if the release body should be omitted.
+        omitBody: true # optional, default is false
+        # Indicates if the release name should be omitted.
+        omitName: true # optional, default is false
+        # Optionally marks this release as prerelease. Set to true to enable.
+        prerelease: true
