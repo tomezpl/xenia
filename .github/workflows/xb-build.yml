@@ -57,7 +57,7 @@ jobs:
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: xb build --config=release
+      run: ./xb build --config=release
       continue-on-error: true # xb build seems to fail because of the trace viewer projects which aren't actually needed for the release
     
     - name: Publish
