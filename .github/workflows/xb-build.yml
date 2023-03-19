@@ -7,7 +7,7 @@ name: xb build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "xb-build-action" ]
   pull_request:
     branches: [ "master" ]
 
