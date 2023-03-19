@@ -53,7 +53,7 @@ jobs:
 
     - name: Setup xb
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: xb setup
+      run: ./xb setup
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
