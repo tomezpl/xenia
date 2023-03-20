@@ -63,6 +63,7 @@ jobs:
     - name: Publish
       uses: ncipollo/release-action@v1.12.0
       with:
+        commit: ${{env.GITHUB_SHA}}
         # An optional flag which indicates if artifact read or upload errors should fail the build.
         artifactErrorsFailBuild: true # optional, default is 
         # An optional set of paths representing artifacts to upload to the release. This may be a single path or a comma delimited list of paths (or globs)
