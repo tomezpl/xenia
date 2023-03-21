@@ -76,3 +76,4 @@ jobs:
         omitName: true # optional, default is false
         # Optionally marks this release as prerelease. Set to true to enable.
         prerelease: true
+        tag: ${{env.GITHUB_SHA}}
