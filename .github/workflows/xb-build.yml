@@ -59,9 +59,16 @@ jobs:
       run: ./xb build --config=release
       continue-on-error: true # xb build seems to fail because of the trace viewer projects which aren't actually needed for the release
       
-    - name: Package
+    - name: Pre-package
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: mkdir packaged && cp ./build/bin/Windows/Release/xenia.exe ./packaged/ && cp ./build/bin/Windows/Release/xenia.pdb ./packaged && cp ./LICENSE ./packaged && cd ./packaged && tar -czvf xenia.zip ./*
+      run: mkdir packaged && cp ./build/bin/Windows/Release/xenia.exe ./packaged/ && cp ./build/bin/Windows/Release/xenia.pdb ./packaged && cp ./LICENSE ./packaged
+  
+    - name: Package
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        type: 'zip'
+        filename: 'xenia.zip'
+        directory: './packaged'
     
     - name: Publish
       uses: ncipollo/release-action@v1.12.0
